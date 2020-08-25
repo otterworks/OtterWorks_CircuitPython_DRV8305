@@ -1,0 +1,77 @@
+Introduction
+============
+
+SPI driver for the Texas Instruments DRV8305.
+
+Patterned after the Adafruit BME280 CircuitPython driver, since that's what I had lying around to hack, test, and compare against.
+
+Installation and Dependencies
+=============================
+
+This driver depends on:
+
+* `Adafruit CircuitPython <https://github.com/adafruit/circuitpython>`_
+* `Bus Device <https://github.com/adafruit/Adafruit_CircuitPython_BusDevice>`_
+
+Please ensure that the driver and all dependencies are available on the
+CircuitPython filesystem.  This can be most easily achieved by downloading and
+installing the latest
+`Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_
+on your device.
+
+Installing from PyPI
+--------------------
+
+On supported GNU/Linux systems like the Raspberry Pi, you can install the driver locally `from
+PyPI <https://pypi.org/project/otterworks-circuitpython-drv8305/>`_. To install for current user:
+
+.. code-block:: shell
+
+    pip3 install otterworks-circuitpython-drv8305
+
+To install system-wide (this may be required in some cases):
+
+.. code-block:: shell
+
+    sudo pip3 install otterworks-circuitpython-drv8305
+
+To install in a virtual environment in your current project:
+
+.. code-block:: shell
+
+    mkdir project-name && cd project-name
+    python3 -m venv .env
+    source .env/bin/activate
+    pip3 install otterworks-circuitpython-drv8305
+
+Usage Example
+=============
+
+.. code-block:: python
+
+    import board
+    import digitalio
+    import busio
+    import time
+    import otterworks_drv8305
+
+    # create library object using Adafruit Bus SPI port
+    spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
+    drv8305 = otterworks_drv8305.OtterWorks_DRV8305_SPI(spi, digitalio.DigitalInOut(board.D10))
+
+
+    while True:
+        print("Temperature: %0.1f C" % drv8305.temperature)
+        time.sleep(3)
+
+Contributing
+============
+
+Contributions are welcome! Please read our `Code of Conduct
+<https://github.com/bluesquall/OtterWorks_CircuitPython_DRV8305/blob/master/CODE_OF_CONDUCT.md>`_
+before contributing to help this project stay welcoming.
+
+Documentation
+=============
+
+TOTODO: build and share on readthedocs.org

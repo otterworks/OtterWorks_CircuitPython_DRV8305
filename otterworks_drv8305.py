@@ -60,22 +60,27 @@ class OtterWorks_DRV8305:
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
         super().__init__()
         """
+        self._w = _DRV_SPI_Word()
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
-        query = 1 << 15 # read
-        query |= (register & 0x0F) << 11) # address is 4-bit nibble
-        # data bits [10:0] do not matter for a read command
-        control = query.to_bytes(2, 'big')
-        response = bytearray(2)
-        self._spi.write_readinto(control, response)
-        return response # N.B. first 5 bits of response don't matter
+        self._w.control.read = True
+        self._w.control.register = register
+        self._w.control.data = 0
+        self._spi.write(_w.as_bytes)
+        self._spi.readinto(_w.as_bytes)
+        # TODO ^    consider going back to write_readinto after confirming
+        #           the same buffer can be used for both args
+        return self._w
 
-    def _write_register(self, register, value):
-        command = 0 << 15 | (register & 0x0F) << 11).to_bytes(2, 'big')
-        response = bytearray(2)
-        self._spi.write_readinto(query, response)
-        if response not 0x0000:
-            raise ValueError("something bad happened")
+    def _write_register(self, register, data):
+        self._w.control.read = False
+        self._w.control.register = register
+        self._w.control.data = data
+        self._spi.write(self._w.as_bytes)
+        self._spi.readinto(self._w.as_bytes)
+        # TODO ^    consider going back to write_readinto after confirming
+        #           the same buffer can be used for both args
+        return self._w
 
     def _get_warning_watchdog_reset(self):
         return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER)
@@ -83,16 +88,26 @@ class OtterWorks_DRV8305:
     def _get_overcurrent(self):
         return self._read_register(_DRV8305_OV_VDS_FAULT_REGISTER)
 
-class _Output_Data_Response_Word(ctypes.Union):
+class _DRV8305_SPI_Word(ctypes.Union):
     _fields_ = [
                 ("as_word", ctypes.c_uint16),
+                ("as_bytes", ctypes.c_byte * 2),
+                ("control", _Control)
                 ("wwr", _Warning_Watchdog_Reset_Flags),
                 ("oc", _Overcurrent_Flags),
+                # TODO: others...
+            ]
+
+class _Control(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("read", ctypes.c_uint8, 1),
+                ("address", ctypes.c_uint8, 4),
+                ("data", ctypes.c_uint8, 11)
             ]
 
 class _Warning_Watchdog_Reset_Flags(ctypes.BigEndianStructure):
     _fields_ = [
-                ("empty", ctypes.c_uint8, 4),
+                ("empty", ctypes.c_uint8, 5),
                 ("fault", ctypes.c_uint8, 1),
                 ("reserved", ctypes.c_uint8, 1),
                 ("temp4", ctypes.c_uint8, 1),
@@ -108,7 +123,7 @@ class _Warning_Watchdog_Reset_Flags(ctypes.BigEndianStructure):
 
 class _Overcurrent_Flags(ctypes.BigEndianStructure):
     _fields_ = [
-                ("empty", ctypes.c_uint8, 4),
+                ("empty", ctypes.c_uint8, 5),
                 ("high_a", ctypes.c_uint8, 1),
                 ("low_a", ctypes.c_uint8, 1),
                 ("high_b", ctypes.c_uint8, 1),

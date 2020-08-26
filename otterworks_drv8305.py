@@ -60,7 +60,7 @@ class OtterWorks_DRV8305:
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
         super().__init__()
         """
-        self._w = _DRV_SPI_Word()
+        self._w = _DRV8305_SPI_Word()
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
         self._w.control.read = True

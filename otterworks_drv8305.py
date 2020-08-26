@@ -52,15 +52,10 @@ class OtterWorks_DRV8305:
     """Driver for DRV8305 Three-Phase Gate Driver"""
 
     def __init__(self, spi, cs, baudrate=100000):
-        # check for a known response to confirm the DRV8395 is there
-
-        """
         import adafruit_bus_device.spi_device as spi_device  # pylint: disable=import-outside-toplevel
-
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
-        super().__init__()
-        """
         self._w = _DRV8305_SPI_Word()
+        # check for a known response to confirm the DRV8395 is there
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
         self._w.control.read = True

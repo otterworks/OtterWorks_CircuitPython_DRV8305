@@ -54,7 +54,7 @@ _DRV8305_VOLTAGE_REGULATOR_CONTROL_REGISTER = const(0x0B)
 _DRV8305_VDS_SENSE_CONTROL_REGISTER = const(0x0C)
 
 class OtterWorks_DRV8305:
-   """Driver for DRV8305 Three-Phase Gate Driver"""
+    """Driver for DRV8305 Three-Phase Gate Driver"""
 
     def __init__(self, spi, cs, baudrate=100000):
         # check for a known response to confirm the DRV8395 is there
@@ -82,7 +82,7 @@ class OtterWorks_DRV8305:
         if response not 0x0000:
             raise ValueError("something bad happened")
 
-   def _get_warning_watchdog_reset(self):
+    def _get_warning_watchdog_reset(self):
         return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER)
 
     def _get_overcurrent(self):

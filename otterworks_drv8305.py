@@ -123,6 +123,100 @@ class _Overcurrent_Flags(ctypes.BigEndianStructure):
                 ("sense_a", ctypes.c_uint8, 1),
             ]
 
+class _IC_Fault_Flags(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("pvdd_uv_2", ctypes.c_uint8, 1),
+                ("watchdog", ctypes.c_uint8, 1),
+                ("overtemp", ctypes.c_uint8, 1),
+                ("reserved", ctypes.c_uint8, 1),
+                ("vreg_uv", ctypes.c_uint8, 1),
+                ("avdd_uv", ctypes.c_uint8, 1),
+                ("low_gate_supply", ctypes.c_uint8, 1),
+                ("reserved_2", ctypes.c_uint8, 1),
+                ("high_charge_pump_uv_2", ctypes.c_uint8, 1),
+                ("high_charge_pump_ov", ctypes.c_uint8, 1),
+                ("high_charge_pump_ov_abs", ctypes.c_uint8, 1),
+            ]
+
+class _VGS_Fault_Flags(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("high_a", ctypes.c_uint8, 1),
+                ("low_a", ctypes.c_uint8, 1),
+                ("high_b", ctypes.c_uint8, 1),
+                ("low_b", ctypes.c_uint8, 1),
+                ("high_c", ctypes.c_uint8, 1),
+                ("low_c", ctypes.c_uint8, 1),
+                ("reserved", ctypes.c_uint8, 5),
+            ]
+
+class _Gate_Control(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("reserved", ctypes.c_uint8, 1),
+                ("t_driven", ctypes.c_uint8, 2),
+                ("i_peak_sink", ctypes.c_uint8, 4),
+                ("i_peak_source", ctypes.c_uint8, 4),
+            ]
+
+class _Drive_Control(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("reserved", ctypes.c_uint8, 1),
+                ("active_freewheeling", ctypes.c_uint8, 1),
+                ("pwm_mode", ctypes.c_uint8, 2),
+                ("dead_time", ctypes.c_uint8, 3),
+                ("vds_sense_blanking", ctypes.c_uint8, 2),
+                ("vds_sense_deglitch", ctypes.c_uint8, 2),
+            ]
+
+class _IC_Operation_Control(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("enable_OTSD", ctypes.c_uint8, 1),
+                ("disable_PVDD_UVLO2", ctypes.c_uint8, 1),
+                ("disable_GDRV_FAULT", ctypes.c_uint8, 1),
+                ("enable_SNS_CLAMP", ctypes.c_uint8, 1),
+                ("watchdog_delay", ctypes.c_uint8, 2),
+                ("disable_SNS_OCP", ctypes.c_uint8, 1),
+                ("enable_watchdog", ctypes.c_uint8, 1),
+                ("sleep", ctypes.c_uint8, 1),
+                ("clear_faults", ctypes.c_uint8, 1),
+                ("set_VCPH_UV", ctypes.c_uint8, 1),
+            ]
+
+class _Shunt_Amplifier_Control(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("calibrate_3", ctypes.c_uint8, 1),
+                ("calibrate_2", ctypes.c_uint8, 1),
+                ("calibrate_1", ctypes.c_uint8, 1),
+                ("blanking", ctypes.c_uint8, 2),
+                ("gain_3", ctypes.c_uint8, 2),
+                ("gain_2", ctypes.c_uint8, 2),
+                ("gain_1", ctypes.c_uint8, 2),
+            ]
+
+class _Voltage_Regulator_Control(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("reserved", ctypes.c_uint8, 1),
+                ("scaling", ctypes.c_uint8, 2),
+                ("reserved_2", ctypes.c_uint8, 1),
+                ("sleep_delay", ctypes.c_uint8, 2),
+                ("disable_undervoltage_fault", ctypes.c_uint8, 1),
+                ("undervoltage_setpoint", ctypes.c_uint8, 2),
+            ]
+
+class _Voltage_Sense_Control(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 5),
+                ("reserved", ctypes.c_uint8, 3),
+                ("comparator_threshold", ctypes.c_uint8, 5),
+                ("mode", ctypes.c_uint8, 3),
+            ]
+
 class _DRV8305_SPI_Word(ctypes.Union):
     _fields_ = [
                 ("as_word", ctypes.c_uint16),
@@ -130,7 +224,14 @@ class _DRV8305_SPI_Word(ctypes.Union):
                 ("control", _Control),
                 ("wwr", _Warning_Watchdog_Reset_Flags),
                 ("oc", _Overcurrent_Flags),
-                # TODO: others...
+                ("ic_fault", _IC_Fault_Flags),
+                ("vgs", _VGS_Fault_Flags),
+                ("hs", _Gate_Control),
+                ("ls", _Gate_Control),
+                ("drive", _Drive_Control),
+                ("ic_op", _IC_Operation_Control),
+                ("shunt", _Shunt_Amplifier_Control),
+                ("vreg", _Voltage_Regulator_Control),
+                ("vsen", _Voltage_Sense_Control),
             ]
-
 

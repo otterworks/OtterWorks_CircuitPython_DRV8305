@@ -1,7 +1,7 @@
 Introduction
 ============
 
-SPI driver for the Texas Instruments DRV8305.
+SPI driver for the Texas Instruments DRV8305 Three-Phase Gate Driver.
 
 Patterned after the Adafruit BME280 CircuitPython driver, since that's what I had lying around to hack, test, and compare against.
 
@@ -22,7 +22,7 @@ on your device.
 Installing from PyPI
 --------------------
 
-On supported GNU/Linux systems like the Raspberry Pi, you can install the driver locally `from
+On supported GNU/Linux systems like the BeagleBone Black, you can install the driver locally `from
 PyPI <https://pypi.org/project/otterworks-circuitpython-drv8305/>`_. To install for current user:
 
 .. code-block:: shell
@@ -55,13 +55,12 @@ Usage Example
     import time
     import otterworks_drv8305
 
-    # create library object using Adafruit Bus SPI port
-    spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-    drv8305 = otterworks_drv8305.OtterWorks_DRV8305_SPI(spi, digitalio.DigitalInOut(board.D10))
-
+    spi = busio.SPI(board.SCK_1, board.MISO_1, board.MOSI_1)
+    cs = digitalio.DigitalInOut(board.D10))
+    drv8305 = otterworks_drv8305.OtterWorks_DRV8305(spi, cs)
 
     while True:
-        print("Temperature: %0.1f C" % drv8305.temperature)
+        print("0x01: 0x%x\n" % drv8305._get_warning_watchdog_reset().as_word)
         time.sleep(3)
 
 Contributing

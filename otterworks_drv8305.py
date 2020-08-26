@@ -130,7 +130,7 @@ class _DRV8305_SPI_Word(ctypes.Union):
     _fields_ = [
                 ("as_word", ctypes.c_uint16),
                 ("as_bytes", ctypes.c_byte * 2),
-                ("control", _Control)
+                ("control", _Control),
                 ("wwr", _Warning_Watchdog_Reset_Flags),
                 ("oc", _Overcurrent_Flags),
                 # TODO: others...

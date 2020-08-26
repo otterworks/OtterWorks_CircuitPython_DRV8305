@@ -80,10 +80,58 @@ class OtterWorks_DRV8305:
             return self._w
 
     def _get_warning_watchdog_reset(self):
-        return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER)
+        return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER).wwr
 
     def _get_overcurrent(self):
-        return self._read_register(_DRV8305_OV_VDS_FAULT_REGISTER)
+        return self._read_register(_DRV8305_OV_VDS_FAULT_REGISTER).oc
+
+    def _get_ic_fault(self):
+        return self._read_register(_DRV8305_IC_FAULT_REGISTER).ic_fault
+
+    def _get_vgs_fault(self):
+        return self._read_register(_DRV8305_VGS_FAULT_REGISTER).vgs
+
+    def _get_high_gate_control(self):
+        return self._read_register(_DRV8305_HS_GATE_DRIVE_CONTROL_REGISTER).hs
+
+    def _set_high_gate_control(self, data):
+        raise NotImplementedError
+
+    def _get_low_gate_control(self):
+        return self._read_register(_DRV8305_LS_GATE_DRIVE_CONTROL_REGISTER).ls
+
+    def _set_low_gate_control(self, data):
+        raise NotImplementedError
+
+    def _get_drive_control(self):
+        return self._read_register(_DRV8305_GATE_DRIVE_CONTROL_REGISTER).drive
+
+    def _set_drive_control(self, data):
+        raise NotImplementedError
+
+    def _get_ic_operation(self):
+        return self._read_register(_DRV8305_IC_OPERATION_REGISTER).ic_op
+
+    def _set_ic_operation(self, data):
+        raise NotImplementedError
+
+    def _get_shunt_amplifier(self):
+        return self._read_register(_DRV8305_SHUNT_AMPLIFIER_CONTROL_REGISTER).shunt
+
+    def _set_shunt_amplifier(self, data):
+        raise NotImplementedError
+
+    def _get_voltage_regulator(self):
+        return self._read_register(_DRV8305_VOLTAGE_REGULATOR_CONTROL_REGISTER).vreg
+
+    def _set_voltage_regulator(self, data):
+        raise NotImplementedError
+
+    def _get_voltage_sense(self):
+        return self._read_register(_DRV8305_VDS_SENSE_CONTROL_REGISTER).vsen
+
+    def _set_voltage_sense(self, data):
+        raise NotImplementedError
 
 class _Control(ctypes.BigEndianStructure):
     _fields_ = [

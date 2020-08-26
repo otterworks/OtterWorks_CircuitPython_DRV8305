@@ -28,7 +28,7 @@ drv8305 = otterworks_drv8305.OtterWorks_DRV8305(spi, cs)
 
 while True:
 
-    wwr = drv8305._get_warning_watchdog_reset().wwr # TODO: wrap _get methods
+    wwr = drv8305._get_warning_watchdog_reset() # TODO: wrap _get methods
 
     if wwr.fault:
         level = logging.CRITICAL
@@ -62,12 +62,16 @@ while True:
 
     # TODO: temp 1-4, vds_status
 
-    oc = drv8305._get_overcurrent().oc
+    oc = drv8305._get_overcurrent()
     logging.debug("high-side overcurrents: A = {a}, B = {b}, C = {c}".format(
         a = (oc.high_a == True), b = (oc.high_b == True), c = (oc.high_c == True)))
     logging.debug("low-side overcurrents: A = {a}, B = {b}, C = {c}".format(
         a = (oc.low_a == True), b = (oc.low_b == True), c = (oc.low_c == True)))
     logging.debug("sense overcurrents: A = {a}, B = {b}, C = {c}".format(
         a = (oc.sense_a == True), b = (oc.sense_b == True), c = (oc.sense_c == True)))
+
+    drive = drv8305._get_drive_control()
+    logging.debug("active freewheeling: {}".format(drive.active_freewheeling == True))
+    logging.debug("PWM mode: {}".format(drive.pwm_mode))
 
     time.sleep(3)

@@ -58,26 +58,26 @@ class OtterWorks_DRV8305:
         # check for a known response to confirm the DRV8395 is there
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
-        with self._w as w, self._spi as spi:
-            w.control.read = True
-            w.control.register = register
-            w.control.data = 0
-            spi.write(w.as_bytes)
-            spi.readinto(w.as_bytes)
+        with self._spi as spi:
+            self._w.control.read = True
+            self._w.control.register = register
+            self._w.control.data = 0
+            spi.write(bytes(self._w)) # TODO: why can't we use .as_bytes here?
+            spi.readinto(self._w.as_bytes)
             # TODO ^    consider going back to write_readinto after
             #           confirming the same buffer can be used for both args
-            return w
+            return self._w
 
     def _write_register(self, register, data):
-        with self._w as w, self._spi as spi:
-            w.control.read = True
-            w.control.register = register
-            w.control.data = data
-            spi.write(w.as_bytes)
-            spi.readinto(w.as_bytes)
+        with self._spi as spi:
+            self._w.control.read = True
+            self._w.control.register = register
+            self._w.control.data = data
+            spi.write(bytes(self._w)) # TODO: why can't we use .as_bytes here?
+            spi.readinto(self._w.as_bytes)
             # TODO ^    consider going back to write_readinto after
             #           confirming the same buffer can be used for both args
-            return w
+            return self._w
 
     def _get_warning_watchdog_reset(self):
         return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER)

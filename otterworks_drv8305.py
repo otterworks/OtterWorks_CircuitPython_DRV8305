@@ -58,24 +58,26 @@ class OtterWorks_DRV8305:
         # check for a known response to confirm the DRV8395 is there
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
-        self._w.control.read = True
-        self._w.control.register = register
-        self._w.control.data = 0
-        self._spi.write(_w.as_bytes)
-        self._spi.readinto(_w.as_bytes)
-        # TODO ^    consider going back to write_readinto after confirming
-        #           the same buffer can be used for both args
-        return self._w
+        with self._w as w, self._spi as spi:
+            w.control.read = True
+            w.control.register = register
+            w.control.data = 0
+            spi.write(w.as_bytes)
+            spi.readinto(w.as_bytes)
+            # TODO ^    consider going back to write_readinto after
+            #           confirming the same buffer can be used for both args
+            return w
 
     def _write_register(self, register, data):
-        self._w.control.read = False
-        self._w.control.register = register
-        self._w.control.data = data
-        self._spi.write(self._w.as_bytes)
-        self._spi.readinto(self._w.as_bytes)
-        # TODO ^    consider going back to write_readinto after confirming
-        #           the same buffer can be used for both args
-        return self._w
+        with self._w as w, self._spi as spi:
+            w.control.read = True
+            w.control.register = register
+            w.control.data = data
+            spi.write(w.as_bytes)
+            spi.readinto(w.as_bytes)
+            # TODO ^    consider going back to write_readinto after
+            #           confirming the same buffer can be used for both args
+            return w
 
     def _get_warning_watchdog_reset(self):
         return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER)

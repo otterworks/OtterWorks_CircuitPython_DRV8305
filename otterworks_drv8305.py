@@ -88,16 +88,6 @@ class OtterWorks_DRV8305:
     def _get_overcurrent(self):
         return self._read_register(_DRV8305_OV_VDS_FAULT_REGISTER)
 
-class _DRV8305_SPI_Word(ctypes.Union):
-    _fields_ = [
-                ("as_word", ctypes.c_uint16),
-                ("as_bytes", ctypes.c_byte * 2),
-                ("control", _Control)
-                ("wwr", _Warning_Watchdog_Reset_Flags),
-                ("oc", _Overcurrent_Flags),
-                # TODO: others...
-            ]
-
 class _Control(ctypes.BigEndianStructure):
     _fields_ = [
                 ("read", ctypes.c_uint8, 1),
@@ -134,6 +124,16 @@ class _Overcurrent_Flags(ctypes.BigEndianStructure):
                 ("sense_c", ctypes.c_uint8, 1),
                 ("sense_b", ctypes.c_uint8, 1),
                 ("sense_a", ctypes.c_uint8, 1),
+            ]
+
+class _DRV8305_SPI_Word(ctypes.Union):
+    _fields_ = [
+                ("as_word", ctypes.c_uint16),
+                ("as_bytes", ctypes.c_byte * 2),
+                ("control", _Control)
+                ("wwr", _Warning_Watchdog_Reset_Flags),
+                ("oc", _Overcurrent_Flags),
+                # TODO: others...
             ]
 
 

@@ -6,6 +6,7 @@ import time
 
 import board
 import busio
+import digitalio
 import otterworks_drv8305
 
 spi = busio.SPI(board.SCK_1, board.MISO_1, board.MOSI_1)

@@ -92,7 +92,7 @@ class _Control(ctypes.BigEndianStructure):
     _fields_ = [
                 ("read", ctypes.c_uint8, 1),
                 ("address", ctypes.c_uint8, 4),
-                ("data", ctypes.c_uint8, 11)
+                ("data", ctypes.c_uint16, 11)
             ]
 
 class _Warning_Watchdog_Reset_Flags(ctypes.BigEndianStructure):

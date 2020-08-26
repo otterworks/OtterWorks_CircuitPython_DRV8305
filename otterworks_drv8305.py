@@ -27,14 +27,9 @@ CircuitPython driver for Texas Instruments DRV8305 Three-Phase Gate Driver
 
 * Author(s): bluesquall
 """
-import math
+import ctypes
 from time import sleep
 from micropython import const
-
-try:
-    import struct
-except ImportError:
-    import ustruct as struct
 
 
 __version__ = "0.0.0-auto.0"
@@ -88,19 +83,42 @@ class OtterWorks_DRV8305:
     def _get_overcurrent(self):
         return self._read_register(_DRV8305_OV_VDS_FAULT_REGISTER)
 
-    @property
-    def mode(self):
-        """
-        Operation mode
-        Allowed values are the constants MODE_*
-        """
-        return self._mode
+class _Output_Data_Response_Word(ctypes.Union):
+    _fields_ = [
+                ("as_word", ctypes.c_uint16),
+                ("wwr", _Warning_Watchdog_Reset_Flags),
+                ("oc", _Overcurrent_Flags),
+            ]
 
-    @mode.setter
-    def mode(self, value):
-        if not value in _DRV8305_MODES:
-            raise ValueError("Mode '%s' not supported" % (value))
-        self._mode = value
-        # self._write_ctrl_meas()
+class _Warning_Watchdog_Reset_Flags(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 4),
+                ("fault", ctypes.c_uint8, 1),
+                ("reserved", ctypes.c_uint8, 1),
+                ("temp4", ctypes.c_uint8, 1),
+                ("pvdd_uv", ctypes.c_uint8, 1),
+                ("pvdd_ov", ctypes.c_uint8, 1),
+                ("vds_status", ctypes.c_uint8, 1),
+                ("vchp_uv", ctypes.c_uint8, 1),
+                ("temp1", ctypes.c_uint8, 1),
+                ("temp2", ctypes.c_uint8, 1),
+                ("temp3", ctypes.c_uint8, 1),
+                ("overtemp", ctypes.c_uint8, 1),
+            ]
+
+class _Overcurrent_Flags(ctypes.BigEndianStructure):
+    _fields_ = [
+                ("empty", ctypes.c_uint8, 4),
+                ("high_a", ctypes.c_uint8, 1),
+                ("low_a", ctypes.c_uint8, 1),
+                ("high_b", ctypes.c_uint8, 1),
+                ("low_b", ctypes.c_uint8, 1),
+                ("high_c", ctypes.c_uint8, 1),
+                ("low_c", ctypes.c_uint8, 1),
+                ("reserved", ctypes.c_uint8, 2),
+                ("sense_c", ctypes.c_uint8, 1),
+                ("sense_b", ctypes.c_uint8, 1),
+                ("sense_a", ctypes.c_uint8, 1),
+            ]
 
 

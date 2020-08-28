@@ -220,6 +220,10 @@ class _Drive_Control(ctypes.BigEndianStructure):
                 ("vds_sense_deglitch", ctypes.c_uint8, 2),
             ]
 
+    @property
+    def pwm_mode(self):
+        return (self.pwm_mode_msb << 1) | self.pwm_mode_lsb
+
 class _IC_Operation_Control(ctypes.BigEndianStructure):
     _fields_ = [
                 ("empty", ctypes.c_uint8, 5),

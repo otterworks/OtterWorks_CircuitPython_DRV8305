@@ -55,15 +55,16 @@ class OtterWorks_DRV8305:
         import adafruit_bus_device.spi_device as spi_device  # pylint: disable=import-outside-toplevel
         self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
         self._w = _DRV8305_SPI_Word()
-        # check for a known response to confirm the DRV8395 is there
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
-        with self._spi as spi:
+        with self._spi as spi: # this calls __enter__ and __exit__ on SPIDevice; __enter__ sets chip select low, __exit__ sets chip select high
             self._w.control.read = True
             self._w.control.register = register
             self._w.control.data = 0
-            spi.write(bytes(self._w)) # TODO: why can't we use .as_bytes here?
-            spi.readinto(self._w.as_bytes)
+            spi.write(self._w)
+            print("wrote: {}".format(self._w))
+            spi.readinto(self._w)
+            print("read: {}".format(self._w))
             # TODO ^    consider going back to write_readinto after
             #           confirming the same buffer can be used for both args
             return self._w
@@ -73,8 +74,8 @@ class OtterWorks_DRV8305:
             self._w.control.read = True
             self._w.control.register = register
             self._w.control.data = data
-            spi.write(bytes(self._w)) # TODO: why can't we use .as_bytes here?
-            spi.readinto(self._w.as_bytes)
+            spi.write(self._w)
+            spi.readinto(self._w)
             # TODO ^    consider going back to write_readinto after
             #           confirming the same buffer can be used for both args
             return self._w
@@ -273,7 +274,7 @@ class _Voltage_Sense_Control(ctypes.BigEndianStructure):
 class _DRV8305_SPI_Word(ctypes.Union):
     _fields_ = [
                 ("as_word", ctypes.c_uint16),
-                ("as_bytes", ctypes.c_byte * 2),
+                ("as_bytes", ctypes.c_ubyte * 2),
                 ("control", _Control),
                 ("wwr", _Warning_Watchdog_Reset_Flags),
                 ("oc", _Overcurrent_Flags),
@@ -287,5 +288,17 @@ class _DRV8305_SPI_Word(ctypes.Union):
                 ("vreg", _Voltage_Regulator_Control),
                 ("vsen", _Voltage_Sense_Control),
             ]
+
+    def __len__(self):
+        return ctypes.sizeof(self)
+
+    def __getitem__(self, i):
+        return self.as_bytes[i]
+
+    def __setitem__(self, i, v):
+        self.as_bytes[i] = v
+
+    def __repr__(self):
+        return "0b{:08b}".format(self.as_word)
 
 assert ctypes.sizeof(_DRV8305_SPI_Word) == 2

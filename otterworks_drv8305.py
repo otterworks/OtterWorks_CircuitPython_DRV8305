@@ -251,7 +251,7 @@ class _Voltage_Regulator_Control(ctypes.BigEndianStructure):
                 ("empty", ctypes.c_uint8, 5),
                 ("reserved", ctypes.c_uint8, 1),
                 ("scaling", ctypes.c_uint8, 2),
-                ("reserved_2", ctypes.c_uint8, 1),
+                ("reserved_2", ctypes.c_uint8, 3),
                 ("sleep_delay", ctypes.c_uint8, 2),
                 ("disable_undervoltage_fault", ctypes.c_uint8, 1),
                 ("undervoltage_setpoint", ctypes.c_uint8, 2),

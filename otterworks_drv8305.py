@@ -288,3 +288,4 @@ class _DRV8305_SPI_Word(ctypes.Union):
                 ("vsen", _Voltage_Sense_Control),
             ]
 
+assert ctypes.sizeof(_DRV8305_SPI_Word) == 2

@@ -14,14 +14,14 @@ logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s',
         datefmt='%Y-%m-%d %H:%M:%S %z', level=logging.DEBUG)
 
 # on beaglebone black, make sure SPI_1 pins are configured
-# subprocess.run(["config-pin", "P9_17", "spi_cs"])
+subprocess.run(["config-pin", "P9_17", "spi_cs"])
 subprocess.run(["config-pin", "P9_18", "spi"])
 subprocess.run(["config-pin", "P9_21", "spi"])
 subprocess.run(["config-pin", "P9_22", "spi_sclk"])
 
-cs = digitalio.DigitalInOut(board.P9_15)
+cs = digitalio.DigitalInOut(board.P9_17)
 cs.switch_to_output()
-cs.value = False
+cs.value = True
 
 spi = busio.SPI(board.SCK_1, board.MISO_1, board.MOSI_1)
 drv8305 = otterworks_drv8305.OtterWorks_DRV8305(spi, cs)
@@ -73,5 +73,8 @@ while True:
     drive = drv8305._get_drive_control()
     logging.debug("active freewheeling: {}".format(drive.active_freewheeling == True))
     logging.debug("PWM mode: {}".format(drive.pwm_mode))
+    logging.debug("dead time: {}".format(drive.dead_time))
+    logging.debug("blanking: {}".format(drive.vds_sense_blanking))
+    logging.debug("deglitch: {}".format(drive.vds_sense_deglitch))
 
     time.sleep(3)

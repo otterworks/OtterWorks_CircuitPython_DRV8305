@@ -51,34 +51,47 @@ _DRV8305_VDS_SENSE_CONTROL_REGISTER = const(0x0C)
 class OtterWorks_DRV8305:
     """Driver for DRV8305 Three-Phase Gate Driver"""
 
-    def __init__(self, spi, cs, baudrate=100000):
+    def __init__(self, spi, cs, baudrate=1000000): # DRV8305 supports up to 10 MHz
         import adafruit_bus_device.spi_device as spi_device  # pylint: disable=import-outside-toplevel
-        self._spi = spi_device.SPIDevice(spi, cs, baudrate=baudrate)
+        spi.try_lock()
+        spi.configure(baudrate=baudrate, polarity=0, phase=1, bits = 16)
+        spi.unlock()
+        self._spi = spi_device.SPIDevice(spi, cs, polarity=0, phase=1) # avoid overwriting polarity & phase
+        # self._spi.configure(bits = 16) # write a 16-bit word instead of 8-bit
         self._w = _DRV8305_SPI_Word()
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
+        self._w.control.read = True
+        self._w.control.address = register
+        self._w.control.data = 0
+        print("writing: {}".format(self._w))
         with self._spi as spi: # this calls __enter__ and __exit__ on SPIDevice; __enter__ sets chip select low, __exit__ sets chip select high
-            self._w.control.read = True
-            self._w.control.register = register
-            self._w.control.data = 0
             spi.write(self._w)
-            print("wrote: {}".format(self._w))
+        print("wrote: {}".format(self._w))
+
+        sleep(1e-6) # minimum 400 ns between frames
+
+        print("reading into: {}".format(self._w))
+        with self._spi as spi: # this calls __enter__ and __exit__ on SPIDevice; __enter__ sets chip select low, __exit__ sets chip select high
             spi.readinto(self._w)
-            print("read: {}".format(self._w))
-            # TODO ^    consider going back to write_readinto after
-            #           confirming the same buffer can be used for both args
-            return self._w
+        print("read: {}".format(self._w))
+
+        return self._w
 
     def _write_register(self, register, data):
-        with self._spi as spi:
-            self._w.control.read = True
-            self._w.control.register = register
-            self._w.control.data = data
+        self._w.control.read = True
+        self._w.control.address = register
+        self._w.control.data = data
+        print("writing: {}".format(self._w))
+        with self._spi as spi: # handles chip select toggle
             spi.write(self._w)
+        print("wrote: {}".format(self._w))
+        sleep(1e-6) # minimum 400 ns between frames
+        print("reading into: {}".format(self._w))
+        with self._spi as spi: # handles chip select toggle
             spi.readinto(self._w)
-            # TODO ^    consider going back to write_readinto after
-            #           confirming the same buffer can be used for both args
-            return self._w
+        print("read: {}".format(self._w))
+        return self._w
 
     def _get_warning_watchdog_reset(self):
         return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER).wwr
@@ -299,6 +312,6 @@ class _DRV8305_SPI_Word(ctypes.Union):
         self.as_bytes[i] = v
 
     def __repr__(self):
-        return "0b{:08b}".format(self.as_word)
+        return "0b {:08b} {:08b}".format(self[0], self[1])
 
 assert ctypes.sizeof(_DRV8305_SPI_Word) == 2

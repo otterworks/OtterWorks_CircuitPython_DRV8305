@@ -10,6 +10,8 @@ import busio
 import digitalio
 import otterworks_drv8305
 
+import Adafruit_BBIO.PWM as PWM
+
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s',
         datefmt='%Y-%m-%d %H:%M:%S %z', level=logging.DEBUG)
 
@@ -18,6 +20,10 @@ subprocess.run(["config-pin", "P9_17", "spi_cs"])
 subprocess.run(["config-pin", "P9_18", "spi"])
 subprocess.run(["config-pin", "P9_21", "spi"])
 subprocess.run(["config-pin", "P9_22", "spi_sclk"])
+
+# set up a PWM output
+subprocess.run(["config-pin", "P9_14", "pwm"])
+PWM.start("P9_14", 50, 1000, 1)
 
 cs = digitalio.DigitalInOut(board.P9_17)
 cs.switch_to_output()

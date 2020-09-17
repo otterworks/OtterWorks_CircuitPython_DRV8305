@@ -25,11 +25,8 @@ subprocess.run(["config-pin", "P9_22", "spi_sclk"])
 subprocess.run(["config-pin", "P9_14", "pwm"])
 PWM.start("P9_14", 50, 1000, 1)
 
-cs = digitalio.DigitalInOut(board.P9_17)
-cs.switch_to_output()
-cs.value = True
-
 spi = busio.SPI(board.SCK_1, board.MISO_1, board.MOSI_1)
+cs = digitalio.DigitalInOut(board.P9_17)
 drv8305 = otterworks_drv8305.OtterWorks_DRV8305(spi, cs)
 
 while True:

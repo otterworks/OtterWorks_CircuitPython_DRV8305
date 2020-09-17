@@ -75,12 +75,11 @@ class OtterWorks_DRV8305:
         print("writing: {}".format(self._w))
         with self._spi as spi: # this calls __enter__ and __exit__ on SPIDevice; __enter__ sets chip select low, __exit__ sets chip select high
             spi.write(self._w)
-        print("wrote: {}".format(self._w))
 
-        sleep(1e-6) # minimum 400 ns between frames
+            self._spi.chip_select.value = True
+            # sleep(500e-9) # minimum 400 ns between frames, B3W seems to take >150 us for toggle
+            self._spi.chip_select.value = False
 
-        print("reading into: {}".format(self._w))
-        with self._spi as spi: # this calls __enter__ and __exit__ on SPIDevice; __enter__ sets chip select low, __exit__ sets chip select high
             spi.readinto(self._w)
         print("read: {}".format(self._w))
 

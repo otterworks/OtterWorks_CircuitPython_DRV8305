@@ -56,7 +56,8 @@ class OtterWorks_DRV8305:
         self._spi = spi_device.SPIDevice(spi, chip_select=cs, polarity=0, phase=1) # avoid overwriting polarity & phase
         self._spi.chip_select.value = True # idle high
         # ^ adafruit_bus_device.spi_device.__init__ switches it to an output with the arg value=True, but I'm seeing it low for ~224 ms on the scope after init if I don't add this
-        self._w = _DRV8305_SPI_Word()
+        self._c = _DRV8305_SPI_Word()
+        self._r = _DRV8305_SPI_Word()
 
     def __repr__(self):
         fmt = """SPI driver for TI DRV8305, configured:
@@ -69,36 +70,26 @@ class OtterWorks_DRV8305:
         return fmt.format(self)
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
-        self._w.control.read = True
-        self._w.control.address = register
-        self._w.control.data = 0
-        print("writing: {}".format(self._w))
+        print("read register 0x{:02X}".format(register))
+        self._c.control.read = True
+        self._c.control.address = register
+        self._c.control.data = 0
+        print("writing: {}".format(self._c))
         with self._spi as spi: # this calls __enter__ and __exit__ on SPIDevice; __enter__ sets chip select low, __exit__ sets chip select high
-            spi.write(self._w)
-
-            self._spi.chip_select.value = True
-            # sleep(500e-9) # minimum 400 ns between frames, B3W seems to take >150 us for toggle
-            self._spi.chip_select.value = False
-
-            spi.readinto(self._w)
-        print("read: {}".format(self._w))
-
-        return self._w
+            spi.write_readinto(self._c, self._r)
+        print("read: {}".format(self._r))
+        return self._r
 
     def _write_register(self, register, data):
-        self._w.control.read = True
-        self._w.control.address = register
-        self._w.control.data = data
-        print("writing: {}".format(self._w))
+        print("write register 0x{:02X}".format(register))
+        self._c.control.read = False
+        self._c.control.address = register
+        self._c.control.data = data
+        print("writing: {}".format(self._c))
         with self._spi as spi: # handles chip select toggle
-            spi.write(self._w)
-        print("wrote: {}".format(self._w))
-        sleep(1e-6) # minimum 400 ns between frames
-        print("reading into: {}".format(self._w))
-        with self._spi as spi: # handles chip select toggle
-            spi.readinto(self._w)
-        print("read: {}".format(self._w))
-        return self._w
+            spi.write_readinto(self._c, self._r)
+        print("read: {}".format(self._r))
+        return self._r
 
     def _get_warning_watchdog_reset(self):
         return self._read_register(_DRV8305_WARNING_WATCHDOG_REGISTER).wwr
@@ -319,6 +310,6 @@ class _DRV8305_SPI_Word(ctypes.Union):
         self.as_bytes[i] = v
 
     def __repr__(self):
-        return "0x{0:02x}{1:02x} (0b {0:08b} {1:08b})".format(self[0], self[1], self[0], self[1])
+        return "0x{0:02X}{1:02x} (0b {0:08b} {1:08b})".format(self[0], self[1], self[0], self[1])
 
 assert ctypes.sizeof(_DRV8305_SPI_Word) == 2

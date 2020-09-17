@@ -21,6 +21,11 @@ subprocess.run(["config-pin", "P9_18", "spi"])
 subprocess.run(["config-pin", "P9_21", "spi"])
 subprocess.run(["config-pin", "P9_22", "spi_sclk"])
 
+# add a GPO to enable the gates and current shunt amplifiers
+en = digitalio.DigitalInOut(board.P9_15)
+en.switch_to_output()
+en.value = True
+
 # set up a PWM output
 subprocess.run(["config-pin", "P9_14", "pwm"])
 PWM.start("P9_14", 50, 1000, 1)

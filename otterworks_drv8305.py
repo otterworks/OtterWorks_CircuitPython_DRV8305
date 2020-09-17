@@ -53,12 +53,20 @@ class OtterWorks_DRV8305:
 
     def __init__(self, spi, cs, baudrate=1000000): # DRV8305 supports up to 10 MHz
         import adafruit_bus_device.spi_device as spi_device  # pylint: disable=import-outside-toplevel
-        spi.try_lock()
-        spi.configure(baudrate=baudrate, polarity=0, phase=1, bits = 16)
-        spi.unlock()
-        self._spi = spi_device.SPIDevice(spi, cs, polarity=0, phase=1) # avoid overwriting polarity & phase
-        # self._spi.configure(bits = 16) # write a 16-bit word instead of 8-bit
+        self._spi = spi_device.SPIDevice(spi, chip_select=cs, polarity=0, phase=1) # avoid overwriting polarity & phase
+        self._spi.chip_select.value = True # idle high
+        # ^ adafruit_bus_device.spi_device.__init__ switches it to an output with the arg value=True, but I'm seeing it low for ~224 ms on the scope after init if I don't add this
         self._w = _DRV8305_SPI_Word()
+
+    def __repr__(self):
+        fmt = """SPI driver for TI DRV8305, configured:
+        baudrate: {0._spi.baudrate}
+        clock polarity: {0._spi.polarity}
+        clock phase: {0._spi.phase}
+        bits per transfer: {0._spi.spi._spi.bits}
+        chip select value: {0._spi.chip_select.value} (active low)
+        """
+        return fmt.format(self)
 
     def _read_register(self, register): # DRV8305 transactions are always 2 bytes
         self._w.control.read = True
@@ -312,6 +320,6 @@ class _DRV8305_SPI_Word(ctypes.Union):
         self.as_bytes[i] = v
 
     def __repr__(self):
-        return "0b {:08b} {:08b}".format(self[0], self[1])
+        return "0x{0:02x}{1:02x} (0b {0:08b} {1:08b})".format(self[0], self[1], self[0], self[1])
 
 assert ctypes.sizeof(_DRV8305_SPI_Word) == 2

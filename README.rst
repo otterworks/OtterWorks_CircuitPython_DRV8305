@@ -27,7 +27,7 @@ PyPI <https://pypi.org/project/otterworks-circuitpython-drv8305/>`_. To install 
 
 .. code-block:: shell
 
-    pip3 install otterworks-circuitpython-drv8305
+    pip3 install --user otterworks-circuitpython-drv8305
 
 To install system-wide (this may be required in some cases):
 
@@ -49,19 +49,21 @@ Usage Example
 
 .. code-block:: python
 
-    import board
-    import digitalio
-    import busio
     import time
+
+    import board
+    import busio
+    import digitalio
+
     import otterworks_drv8305
 
     spi = busio.SPI(board.SCK_1, board.MISO_1, board.MOSI_1)
-    cs = digitalio.DigitalInOut(board.D10))
+    cs = digitalio.DigitalInOut(board.P9_17))
     drv8305 = otterworks_drv8305.OtterWorks_DRV8305(spi, cs)
 
     while True:
-        print("0x01: 0x%x\n" % drv8305._get_warning_watchdog_reset().as_word)
-        time.sleep(3)
+        print(drv8305._get_warning_watchdog_reset())
+        time.sleep(1)
 
 Contributing
 ============
@@ -73,4 +75,4 @@ before contributing to help this project stay welcoming.
 Documentation
 =============
 
-TOTODO: build and share on readthedocs.org
+TODO: build and share on readthedocs.org

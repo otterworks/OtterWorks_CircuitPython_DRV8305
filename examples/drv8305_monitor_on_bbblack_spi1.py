@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from logging.handlers import RotatingFileHandler
 import subprocess
 import time
 
@@ -13,7 +14,9 @@ import otterworks_drv8305
 import Adafruit_BBIO.PWM as PWM
 
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S %z', level=logging.DEBUG)
+        datefmt='%Y-%m-%d %H:%M:%S %z', level=logging.DEBUG,
+        handlers=[RotatingFileHandler('drv8305monitor.log',
+            maxBytes=10000, backupCount=13)])
 
 # on beaglebone black, make sure SPI_1 pins are configured
 subprocess.run(["config-pin", "P9_28", "spi_cs"])

@@ -11,8 +11,6 @@ import busio
 import digitalio
 import otterworks_drv8305
 
-import Adafruit_BBIO.PWM as PWM
-
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s',
         datefmt='%Y-%m-%d %H:%M:%S %z', level=logging.DEBUG,
         handlers=[RotatingFileHandler('drv8305monitor.log',
@@ -24,9 +22,7 @@ subprocess.run(["config-pin", "P9_29", "spi"])
 subprocess.run(["config-pin", "P9_30", "spi"])
 subprocess.run(["config-pin", "P9_31", "spi_sclk"])
 
-# set up a PWM output
-subprocess.run(["config-pin", "P9_14", "pwm"])
-PWM.start("P9_14", 50, 1000, 1)
+# spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 
 spi = busio.SPI(board.SCK_1, board.MISO_1, board.MOSI_1)
 cs = digitalio.DigitalInOut(board.P9_28)

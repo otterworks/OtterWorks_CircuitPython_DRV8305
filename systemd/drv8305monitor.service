@@ -1,0 +1,17 @@
+[Unit]
+Description=A monitor for the TI DRV8305 3-Phase Gate Driver
+After=generic-board-startup.service
+
+[Service]
+Type=simple
+Restart=always
+User=debian
+WorkingDirectory=~
+ExecStart=/usr/bin/python3 OtterWorks_CircuitPython_DRV8305/examples/drv8305_monitor_on_bbblack_spi0.py
+ExecReload=/bin/kill -HUP $MAINPID
+StandardOutput=null
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=default.target

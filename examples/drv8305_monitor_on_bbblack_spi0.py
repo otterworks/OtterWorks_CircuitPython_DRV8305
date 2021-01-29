@@ -22,9 +22,7 @@ subprocess.run(["config-pin", "P9_18", "spi"])
 subprocess.run(["config-pin", "P9_21", "spi"])
 subprocess.run(["config-pin", "P9_22", "spi_sclk"])
 
-# spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
-
-spi = busio.SPI(board.SCK_1, board.MISO_1, board.MOSI_1)
+spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 cs = digitalio.DigitalInOut(board.P9_17)
 drv8305 = otterworks_drv8305.OtterWorks_DRV8305(spi, cs)
 
